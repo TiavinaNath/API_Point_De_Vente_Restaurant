@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class IngredientRestController {
@@ -59,5 +60,15 @@ public class IngredientRestController {
                 new Ingredient(1L, "Oeuf", 1000.0, Instant.parse("2025-03-01T00:00:00Z")),
                 new Ingredient(2L, "Huile", 10000.0, Instant.parse("2025-03-20T00:00:00Z"))
         );
+    }
+
+    @GetMapping("/ingredients/{id}")
+    public ResponseEntity<Object> getIngredient(@PathVariable Long id) {
+        Optional<Ingredient> optionalIngredient = getIngredientList().stream().filter(ingredient -> ingredient.getId().equals(id))
+                .findAny();
+        if (optionalIngredient.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(optionalIngredient.get());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ingredient=" + id + " not found");
     }
 }
