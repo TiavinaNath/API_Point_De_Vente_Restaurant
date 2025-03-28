@@ -1,6 +1,7 @@
 package edu.hei.school.restaurant.endpoint;
 
 import edu.hei.school.restaurant.model.Ingredient;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,8 +13,20 @@ import java.util.List;
 @RestController
 public class IngredientRestController {
     @GetMapping("/ingredients")
-    public ResponseEntity<List<Ingredient>> getIngredients(@RequestParam(name = "priceMinFilter", required = false) Double priceMinFilter,
-                                                           @RequestParam(name = "priceMaxFilter", required = false) Double priceMaxFilter) {
+    public ResponseEntity<Object> getIngredients(@RequestParam(name = "priceMinFilter", required = false) Double priceMinFilter,
+                                                 @RequestParam(name = "priceMaxFilter", required = false) Double priceMaxFilter) {
+        if (priceMinFilter != null && priceMinFilter < 0) {
+            return new ResponseEntity<>("PriceMinFilter " + priceMinFilter + " is negative", HttpStatus.BAD_REQUEST);
+        }
+        if (priceMaxFilter != null && priceMaxFilter < 0) {
+            return new ResponseEntity<>("PriceMaxFilter " + priceMaxFilter + " is negative", HttpStatus.BAD_REQUEST);
+        }
+        if (priceMinFilter != null && priceMaxFilter != null) {
+            if (priceMinFilter > priceMaxFilter) {
+                return ResponseEntity.badRequest()
+                        .body("PriceMinFilter " + priceMinFilter + " is greater than PriceMaxFilter " + priceMaxFilter);
+            }
+        }
         List<Ingredient> ingredients = getIngredientList();
         List<Ingredient> filteredIngredients = ingredients.stream()
                 .filter(ingredient -> {
