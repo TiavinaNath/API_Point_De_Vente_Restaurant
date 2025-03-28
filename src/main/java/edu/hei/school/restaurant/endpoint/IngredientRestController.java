@@ -3,9 +3,7 @@ package edu.hei.school.restaurant.endpoint;
 import edu.hei.school.restaurant.model.Ingredient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -44,6 +42,16 @@ public class IngredientRestController {
                 })
                 .toList();
         return ResponseEntity.ok().body(filteredIngredients);
+    }
+
+    @PostMapping("/ingredients")
+    public ResponseEntity<Object> addIngredients(@RequestBody List<Ingredient> ingredients) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ingredients);
+    }
+
+    @PutMapping("/ingredients")
+    public ResponseEntity<Object> updateIngredients(@RequestBody List<Ingredient> ingredients) {
+        return ResponseEntity.status(HttpStatus.OK).body(ingredients);
     }
 
     private static List<Ingredient> getIngredientList() {
