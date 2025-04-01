@@ -22,9 +22,25 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
     private final DataSource dataSource;
     private final IngredientMapper ingredientMapper;
 
+    // TODO : default values for page and size
     @Override
     public List<Ingredient> getAll(int page, int size) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        List<Ingredient> ingredients = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "select i.id, i.name from ingredient i order by i.id asc limit ? offset ?")) {
+            statement.setInt(1, size);
+            statement.setInt(2, size * (page - 1));
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Ingredient ingredient = ingredientMapper.apply(resultSet);
+                    ingredients.add(ingredient);
+                }
+                return ingredients;
+            }
+        } catch (SQLException e) {
+            throw new ServerException(e);
+        }
     }
 
     @Override

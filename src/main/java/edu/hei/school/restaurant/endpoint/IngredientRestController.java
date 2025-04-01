@@ -21,8 +21,15 @@ public class IngredientRestController {
     @GetMapping("/ingredients")
     public ResponseEntity<Object> getIngredients(@RequestParam(name = "priceMinFilter", required = false) Double priceMinFilter,
                                                  @RequestParam(name = "priceMaxFilter", required = false) Double priceMaxFilter) {
-
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            return ResponseEntity.ok().body(ingredientService.getIngredientsByPrices(priceMinFilter, priceMaxFilter));
+        } catch (ClientException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
+        } catch (ServerException e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 
     @PostMapping("/ingredients")

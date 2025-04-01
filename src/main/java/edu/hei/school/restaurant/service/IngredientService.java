@@ -2,7 +2,10 @@ package edu.hei.school.restaurant.service;
 
 import edu.hei.school.restaurant.dao.operations.IngredientCrudOperations;
 import edu.hei.school.restaurant.model.Ingredient;
+import edu.hei.school.restaurant.service.exception.ClientException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,6 +14,38 @@ import java.util.List;
 @RequiredArgsConstructor
 public class IngredientService {
     private final IngredientCrudOperations ingredientCrudOperations;
+
+    public List<Ingredient> getIngredientsByPrices(Double priceMinFilter, Double priceMaxFilter) {
+        if (priceMinFilter != null && priceMinFilter < 0) {
+            throw new ClientException("PriceMinFilter " + priceMinFilter + " is negative");
+        }
+        if (priceMaxFilter != null && priceMaxFilter < 0) {
+            throw new ClientException("PriceMaxFilter " + priceMaxFilter + " is negative");
+        }
+        if (priceMinFilter != null && priceMaxFilter != null) {
+            if (priceMinFilter > priceMaxFilter) {
+                throw new ClientException("PriceMinFilter " + priceMinFilter + " is greater than PriceMaxFilter " + priceMaxFilter);
+            }
+        }
+        // TODO : paginate from restController OR filter from repository directly
+        List<Ingredient> ingredients = ingredientCrudOperations.getAll(1, 500);
+
+        return ingredients.stream()
+                .filter(ingredient -> {
+                    if (priceMinFilter == null && priceMaxFilter == null) {
+                        return true;
+                    }
+                    Double unitPrice = ingredient.getActualPrice();
+                    if (priceMinFilter != null && priceMaxFilter == null) {
+                        return unitPrice >= priceMinFilter;
+                    }
+                    if (priceMinFilter == null) {
+                        return unitPrice <= priceMaxFilter;
+                    }
+                    return unitPrice >= priceMinFilter && unitPrice <= priceMaxFilter;
+                })
+                .toList();
+    }
 
     public List<Ingredient> getAll(Integer page, Integer size) {
         return ingredientCrudOperations.getAll(page, size);
