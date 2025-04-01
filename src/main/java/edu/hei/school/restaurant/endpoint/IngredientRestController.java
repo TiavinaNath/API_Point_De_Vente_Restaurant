@@ -1,5 +1,7 @@
 package edu.hei.school.restaurant.endpoint;
 
+import edu.hei.school.restaurant.endpoint.mapper.IngredientRestMapper;
+import edu.hei.school.restaurant.endpoint.rest.IngredientRest;
 import edu.hei.school.restaurant.model.Ingredient;
 import edu.hei.school.restaurant.service.IngredientService;
 import edu.hei.school.restaurant.service.exception.ClientException;
@@ -17,12 +19,17 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequiredArgsConstructor
 public class IngredientRestController {
     private final IngredientService ingredientService;
+    private final IngredientRestMapper ingredientRestMapper;
 
     @GetMapping("/ingredients")
     public ResponseEntity<Object> getIngredients(@RequestParam(name = "priceMinFilter", required = false) Double priceMinFilter,
                                                  @RequestParam(name = "priceMaxFilter", required = false) Double priceMaxFilter) {
         try {
-            return ResponseEntity.ok().body(ingredientService.getIngredientsByPrices(priceMinFilter, priceMaxFilter));
+            List<Ingredient> ingredientsByPrices = ingredientService.getIngredientsByPrices(priceMinFilter, priceMaxFilter);
+            List<IngredientRest> ingredientRests = ingredientsByPrices.stream()
+                    .map(ingredient -> ingredientRestMapper.toRest(ingredient))
+                    .toList();
+            return ResponseEntity.ok().body(ingredientRests);
         } catch (ClientException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (NotFoundException e) {
@@ -40,7 +47,10 @@ public class IngredientRestController {
     @PutMapping("/ingredients")
     public ResponseEntity<Object> updateIngredients(@RequestBody List<Ingredient> ingredients) {
         try {
-            return ResponseEntity.ok().body(ingredientService.saveAll(ingredients));
+            List<IngredientRest> ingredientsRest = ingredientService.saveAll(ingredients).stream()
+                    .map(ingredient -> ingredientRestMapper.toRest(ingredient))
+                    .toList();
+            return ResponseEntity.ok().body(ingredientsRest);
         } catch (ServerException e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
@@ -49,7 +59,7 @@ public class IngredientRestController {
     @GetMapping("/ingredients/{id}")
     public ResponseEntity<Object> getIngredient(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok().body(ingredientService.getById(id));
+            return ResponseEntity.ok().body(ingredientRestMapper.toRest(ingredientService.getById(id)));
         } catch (ClientException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (NotFoundException e) {

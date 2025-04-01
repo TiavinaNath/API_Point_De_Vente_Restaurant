@@ -42,7 +42,6 @@ public class Ingredient {
         return getPrices();
     }
 
-
     public Double getActualPrice() {
         return findActualPrice().orElse(new Price(0.0)).getAmount();
     }
