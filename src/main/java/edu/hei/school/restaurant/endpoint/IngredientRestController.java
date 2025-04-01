@@ -2,12 +2,16 @@ package edu.hei.school.restaurant.endpoint;
 
 import edu.hei.school.restaurant.model.Ingredient;
 import edu.hei.school.restaurant.service.IngredientService;
+import edu.hei.school.restaurant.service.exception.ClientException;
+import edu.hei.school.restaurant.service.exception.NotFoundException;
 import edu.hei.school.restaurant.service.exception.ServerException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +41,14 @@ public class IngredientRestController {
 
     @GetMapping("/ingredients/{id}")
     public ResponseEntity<Object> getIngredient(@PathVariable Long id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            return ResponseEntity.ok().body(ingredientService.getById(id));
+        } catch (ClientException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
+        } catch (ServerException e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 }
