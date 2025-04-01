@@ -1,5 +1,6 @@
 package edu.hei.school.restaurant.dao;
 
+import edu.hei.school.restaurant.service.exception.ServerException;
 import org.springframework.context.annotation.Configuration;
 
 import java.sql.Connection;
@@ -23,7 +24,7 @@ public class DataSource {
         try {
             return DriverManager.getConnection(jdbcUrl, user, password);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException(e);
         }
     }
 }

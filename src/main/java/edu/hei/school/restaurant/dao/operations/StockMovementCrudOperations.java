@@ -1,9 +1,9 @@
 package edu.hei.school.restaurant.dao.operations;
 
 import edu.hei.school.restaurant.dao.DataSource;
+import edu.hei.school.restaurant.dao.mapper.StockMovementMapper;
 import edu.hei.school.restaurant.model.StockMovement;
-import edu.hei.school.restaurant.model.StockMovementType;
-import edu.hei.school.restaurant.model.Unit;
+import edu.hei.school.restaurant.service.exception.ServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +17,8 @@ import static java.time.Instant.now;
 public class StockMovementCrudOperations implements CrudOperations<StockMovement> {
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private StockMovementMapper stockMovementMapper;
 
     @Override
     public List<StockMovement> getAll(int page, int size) {
@@ -48,17 +50,17 @@ public class StockMovementCrudOperations implements CrudOperations<StockMovement
                     statement.setLong(6, entityToSave.getIngredient().getId());
                     statement.addBatch(); // group by batch so executed as one query in database
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    throw new ServerException(e);
                 }
             });
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    stockMovements.add(mapFromResultSet(resultSet));
+                    stockMovements.add(stockMovementMapper.apply(resultSet));
                 }
             }
             return stockMovements;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException(e);
         }
     }
 
@@ -72,22 +74,12 @@ public class StockMovementCrudOperations implements CrudOperations<StockMovement
             statement.setLong(1, idIngredient);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    stockMovements.add(mapFromResultSet(resultSet));
+                    stockMovements.add(stockMovementMapper.apply(resultSet));
                 }
                 return stockMovements;
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException(e);
         }
-    }
-
-    private StockMovement mapFromResultSet(ResultSet resultSet) throws SQLException {
-        StockMovement stockMovement = new StockMovement();
-        stockMovement.setId(resultSet.getLong("id"));
-        stockMovement.setQuantity(resultSet.getDouble("quantity"));
-        stockMovement.setMovementType(StockMovementType.valueOf(resultSet.getString("movement_type")));
-        stockMovement.setUnit(Unit.valueOf(resultSet.getString("unit")));
-        stockMovement.setCreationDatetime(resultSet.getTimestamp("creation_datetime").toInstant());
-        return stockMovement;
     }
 }

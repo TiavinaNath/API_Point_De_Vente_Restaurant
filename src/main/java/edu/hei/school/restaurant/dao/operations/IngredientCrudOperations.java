@@ -3,6 +3,8 @@ package edu.hei.school.restaurant.dao.operations;
 import edu.hei.school.restaurant.dao.DataSource;
 import edu.hei.school.restaurant.model.Ingredient;
 import edu.hei.school.restaurant.dao.mapper.IngredientMapper;
+import edu.hei.school.restaurant.service.exception.NotFoundException;
+import edu.hei.school.restaurant.service.exception.ServerException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Repository;
@@ -30,17 +32,17 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "select i.id, i.name, di.id as dish_ingredient_id, di.required_quantity, di.unit from ingredient i"
-                     + " join dish_ingredient di on i.id = di.id_ingredient"
-                     + " where i.id = ?")) {
+                             + " join dish_ingredient di on i.id = di.id_ingredient"
+                             + " where i.id = ?")) {
             statement.setLong(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return ingredientMapper.apply(resultSet);
                 }
-                throw new RuntimeException("Ingredient.id=" + id + " not found");
+                throw new NotFoundException("Ingredient.id=" + id + " not found");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException(e);
         }
     }
 
@@ -58,7 +60,7 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
                         statement.setString(1, entityToSave.getName());
                         statement.addBatch(); // group by batch so executed as one query in database
                     } catch (SQLException e) {
-                        throw new RuntimeException(e);
+                        throw new ServerException(e);
                     }
                 });
                 try (ResultSet resultSet = statement.executeQuery()) {

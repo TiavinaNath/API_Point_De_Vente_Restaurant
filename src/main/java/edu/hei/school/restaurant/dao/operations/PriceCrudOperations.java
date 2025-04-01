@@ -1,7 +1,9 @@
 package edu.hei.school.restaurant.dao.operations;
 
 import edu.hei.school.restaurant.dao.DataSource;
+import edu.hei.school.restaurant.dao.mapper.PriceMapper;
 import edu.hei.school.restaurant.model.Price;
+import edu.hei.school.restaurant.service.exception.ServerException;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -14,6 +16,8 @@ import java.util.List;
 public class PriceCrudOperations implements CrudOperations<Price> {
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private PriceMapper priceMapper;
 
     @Override
     public List<Price> getAll(int page, int size) {
@@ -42,12 +46,12 @@ public class PriceCrudOperations implements CrudOperations<Price> {
                     statement.setLong(4, entityToSave.getIngredient().getId());
                     statement.addBatch(); // group by batch so executed as one query in database
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    throw new ServerException(e);
                 }
             });
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    prices.add(mapFromResultSet(resultSet));
+                    prices.add(priceMapper.apply(resultSet));
                 }
             }
             return prices;
@@ -63,21 +67,13 @@ public class PriceCrudOperations implements CrudOperations<Price> {
             statement.setLong(1, idIngredient);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    Price price = mapFromResultSet(resultSet);
+                    Price price = priceMapper.apply(resultSet);
                     prices.add(price);
                 }
                 return prices;
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException(e);
         }
-    }
-
-    private Price mapFromResultSet(ResultSet resultSet) throws SQLException {
-        Price price = new Price();
-        price.setId(resultSet.getLong("id"));
-        price.setAmount(resultSet.getDouble("amount"));
-        price.setDateValue(resultSet.getDate("date_value").toLocalDate());
-        return price;
     }
 }
