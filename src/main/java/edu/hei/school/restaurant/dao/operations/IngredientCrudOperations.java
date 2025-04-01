@@ -21,6 +21,8 @@ import java.util.List;
 public class IngredientCrudOperations implements CrudOperations<Ingredient> {
     private final DataSource dataSource;
     private final IngredientMapper ingredientMapper;
+    private final PriceCrudOperations priceCrudOperations;
+    private final StockMovementCrudOperations stockMovementCrudOperations;
 
     // TODO : default values for page and size
     @Override
@@ -79,6 +81,8 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
                     } catch (SQLException e) {
                         throw new ServerException(e);
                     }
+                    priceCrudOperations.saveAll((entityToSave.getPrices()));
+                    stockMovementCrudOperations.saveAll((entityToSave.getStockMovements()));
                 });
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
