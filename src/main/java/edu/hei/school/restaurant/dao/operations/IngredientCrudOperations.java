@@ -53,7 +53,7 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement =
                          connection.prepareStatement("insert into ingredient (name) values (?)"
-                                 + " on conflict (id) do update set name=excluded.name?"
+                                 + " on conflict (id) do update set name=excluded.name"
                                  + " returning id, name")) {
                 entities.forEach(entityToSave -> {
                     try {
