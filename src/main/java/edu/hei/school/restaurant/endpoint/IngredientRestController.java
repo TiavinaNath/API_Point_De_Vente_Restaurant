@@ -1,6 +1,7 @@
 package edu.hei.school.restaurant.endpoint;
 
 import edu.hei.school.restaurant.endpoint.mapper.IngredientRestMapper;
+import edu.hei.school.restaurant.endpoint.rest.CreateOrUpdateIngredient;
 import edu.hei.school.restaurant.endpoint.rest.IngredientRest;
 import edu.hei.school.restaurant.model.Ingredient;
 import edu.hei.school.restaurant.service.IngredientService;
@@ -45,8 +46,11 @@ public class IngredientRestController {
     }
 
     @PutMapping("/ingredients")
-    public ResponseEntity<Object> updateIngredients(@RequestBody List<Ingredient> ingredients) {
+    public ResponseEntity<Object> updateIngredients(@RequestBody List<CreateOrUpdateIngredient> ingredientsToCreateOrUpdate) {
         try {
+            List<Ingredient> ingredients = ingredientsToCreateOrUpdate.stream()
+                    .map(ingredient -> ingredientRestMapper.toModel(ingredient))
+                    .toList();
             List<IngredientRest> ingredientsRest = ingredientService.saveAll(ingredients).stream()
                     .map(ingredient -> ingredientRestMapper.toRest(ingredient))
                     .toList();

@@ -68,12 +68,13 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
         List<Ingredient> ingredients = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement =
-                         connection.prepareStatement("insert into ingredient (name) values (?)"
+                         connection.prepareStatement("insert into ingredient (id, name) values (?, ?)"
                                  + " on conflict (id) do update set name=excluded.name"
                                  + " returning id, name")) {
                 entities.forEach(entityToSave -> {
                     try {
-                        statement.setString(1, entityToSave.getName());
+                        statement.setLong(1, entityToSave.getId());
+                        statement.setString(2, entityToSave.getName());
                         statement.addBatch(); // group by batch so executed as one query in database
                     } catch (SQLException e) {
                         throw new ServerException(e);
