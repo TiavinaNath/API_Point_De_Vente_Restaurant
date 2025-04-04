@@ -1,0 +1,89 @@
+openapi: 3.1.0
+info:
+  title: Restaurant Management API - 2025 [J]
+  description: Restaurant Management API - 2025 [J]
+  version: 1.0.0
+servers:
+  - url: 'https://localhost:8080'
+paths:
+  /ingredients:
+    get:
+      summary: Get list of ingredients
+      description: List of ingredients
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: int
+          required: false
+        - in: query
+          name: pageSize
+          schema:
+            type: int
+          required: false
+      responses:
+        200:
+          description: List of ingredients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+components:
+  schemas:
+    Ingredient:
+      type: object
+      properties:
+        id:
+          type: int
+        name:
+          type: string
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Price'
+        stockMovements:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockMovement'
+        availableQuantity:
+          type: float
+        actualPrice:
+          type: float
+    Price:
+      type: object
+      properties:
+        id:
+          type: int
+        price:
+          type: float
+        dateValue:
+          type: string
+          format: date
+    StockMovement:
+      type: object
+      properties:
+        id:
+          type: int
+        quantity:
+          type: float
+        unit:
+          $ref: '#/components/schemas/Unit'
+        type:
+          $ref: '#/components/schemas/StockMovementType'
+        creationDatetime:
+          type: string
+          format: date-time
+    StockMovementType:
+      type: string
+      enum:
+        - IN
+        - OUT
+    Unit:
+      type: string
+      enum:
+        - G
+        - U
+        - L
+
