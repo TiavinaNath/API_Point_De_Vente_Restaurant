@@ -30,7 +30,54 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Ingredient'
+  /ingredients/{id}/prices:
+    put:
+      summary: Add new prices to a specifc ingredient
+      parameters:
+        - $ref: '#/components/parameters/IngredientIdentifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Price'
+        required: true
+      responses:
+        200:
+          description: The specific ingredient with updated price history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+  /ingredients/{id}/stockMovements:
+    put:
+      summary: Add new stock movements to a specifc ingredient
+      parameters:
+        - $ref: '#/components/parameters/IngredientIdentifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockMovement'
+        required: true
+      responses:
+        200:
+          description: The specific ingredient with updated stockMovement history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
 components:
+  parameters:
+    IngredientIdentifier:
+      in: path
+      name: id
+      schema:
+        type: int
+      required: true
   schemas:
     Ingredient:
       type: object
@@ -86,4 +133,3 @@ components:
         - G
         - U
         - L
-
