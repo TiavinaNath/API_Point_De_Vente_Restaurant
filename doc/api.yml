@@ -11,16 +11,8 @@ paths:
       summary: Get list of ingredients
       description: List of ingredients
       parameters:
-        - in: query
-          name: page
-          schema:
-            type: int
-          required: false
-        - in: query
-          name: pageSize
-          schema:
-            type: int
-          required: false
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
       responses:
         200:
           description: List of ingredients
@@ -70,6 +62,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ingredient'
+  /dishes:
+    get:
+      summary: Get dishes
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        200:
+          description: List of dishes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dish'
+
 components:
   parameters:
     IngredientIdentifier:
@@ -78,14 +86,53 @@ components:
       schema:
         type: int
       required: true
+    Page:
+      in: query
+      name: page
+      schema:
+        type: int
+        required: false
+    PageSize:
+      in: query
+      name: pageSize
+      schema:
+        type: int
+        required: false
   schemas:
-    Ingredient:
+    Dish:
       type: object
       properties:
         id:
           type: int
         name:
           type: string
+        availableQuantity:
+          type: int
+        actualPrice:
+          type: float
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/DishIngredient'
+    DishIngredient:
+      type: object
+      properties:
+        requiredQuantity:
+          type: float
+        unit:
+          $ref: '#/components/schemas/Unit'
+        ingredient:
+          $ref: '#/components/schemas/IngredientBasicProperty'
+    IngredientBasicProperty:
+      type: object
+      properties:
+        id:
+          type: int
+        name:
+          type: string
+    Ingredient:
+      type: object
+      properties:
         prices:
           type: array
           items:
@@ -98,6 +145,8 @@ components:
           type: float
         actualPrice:
           type: float
+      allOf:
+        - $ref: '#/components/schemas/IngredientBasicProperty'
     Price:
       type: object
       properties:
