@@ -108,4 +108,19 @@ public class DishCrudOperations implements CrudOperations<Dish>{
     }
 
 
+    public Dish findByName(String name) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "select d.id, d.name, d.price from dish d where d.name ilike ?")) {
+            statement.setString(1, name);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return dishMapper.apply(resultSet);
+                }
+                throw new NotFoundException("Dish.name=" + name + " not found");
+            }
+        } catch (SQLException e) {
+            throw new ServerException(e);
+        }
+    }
 }

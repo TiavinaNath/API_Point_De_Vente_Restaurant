@@ -28,6 +28,10 @@ public class Dish {
         return getPrice() - getTotalIngredientsCostAt(dateValue);
     }
 
+    public Dish(String name) {
+        this.name = name;
+    }
+
     public Double getTotalIngredientsCost() {
         return dishIngredients.stream()
                 .map(dishIngredient -> {

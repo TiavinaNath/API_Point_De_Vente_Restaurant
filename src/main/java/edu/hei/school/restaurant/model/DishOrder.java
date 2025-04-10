@@ -2,6 +2,7 @@ package edu.hei.school.restaurant.model;
 
 import lombok.*;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 
@@ -32,6 +33,37 @@ public class DishOrder {
 
     public double getTotalPrice() {
         return dish.getPrice() * quantity;
+    }
+
+    public DishOrderStatusHistory updateStatus(DishOrderStatusHistory newStatusHistory) {
+        StatusDishOrder currentStatus = this.getActualStatus();
+        StatusDishOrder newStatus = newStatusHistory.getStatus();
+
+        if (!isValidStatusTransition(currentStatus, newStatus)) {
+            throw new RuntimeException("Transition de statut invalide : " + currentStatus + " -> " + newStatus);
+        }
+
+        newStatusHistory.setCreationDateTime(Instant.now());
+        this.getDishOrderStatusHistoryList().add(newStatusHistory);
+
+        return newStatusHistory;
+    }
+
+    private boolean isValidStatusTransition(StatusDishOrder currentStatus, StatusDishOrder newStatus) {
+        switch (currentStatus) {
+            case CREATED:
+                return newStatus == StatusDishOrder.CONFIRMED;
+            case CONFIRMED:
+                return newStatus == StatusDishOrder.IN_PROGRESS;
+            case IN_PROGRESS:
+                return newStatus == StatusDishOrder.FINISHED;
+            case FINISHED:
+                return newStatus == StatusDishOrder.DELIVERED;
+            case DELIVERED:
+                return false;
+            default:
+                return false;
+        }
     }
 
 }

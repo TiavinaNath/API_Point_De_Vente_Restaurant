@@ -1,11 +1,14 @@
 package edu.hei.school.restaurant.endpoint;
 
+import edu.hei.school.restaurant.endpoint.mapper.IngredientRestMapper;
 import edu.hei.school.restaurant.endpoint.rest.CreateDishIngredient;
+import edu.hei.school.restaurant.endpoint.rest.CreateIngredientPrice;
 import edu.hei.school.restaurant.endpoint.rest.DishRest;
-import edu.hei.school.restaurant.endpoint.rest.DishRestMapper;
+import edu.hei.school.restaurant.endpoint.rest.IngredientRest;
 import edu.hei.school.restaurant.model.Dish;
 import edu.hei.school.restaurant.model.DishIngredient;
 import edu.hei.school.restaurant.model.Ingredient;
+import edu.hei.school.restaurant.model.Price;
 import edu.hei.school.restaurant.service.DishService;
 import edu.hei.school.restaurant.service.exception.ClientException;
 import edu.hei.school.restaurant.service.exception.NotFoundException;
@@ -22,7 +25,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RestController
 public class DishRestController {
     private final DishService dishService;
-    private final DishRestMapper dishRestMapper;
+    private final IngredientRestMapper.DishRestMapper dishRestMapper;
 
     @GetMapping("/dishes")
     public ResponseEntity<Object> getDishes(
@@ -53,4 +56,6 @@ public class DishRestController {
         DishRest dishRest = dishRestMapper.toRest(dish);
         return ResponseEntity.ok().body(dishRest);
     }
+
+
 }

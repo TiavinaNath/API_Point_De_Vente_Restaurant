@@ -1,12 +1,11 @@
 package edu.hei.school.restaurant.endpoint.mapper;
 
 import edu.hei.school.restaurant.dao.operations.IngredientCrudOperations;
-import edu.hei.school.restaurant.endpoint.rest.CreateOrUpdateIngredient;
-import edu.hei.school.restaurant.endpoint.rest.IngredientRest;
-import edu.hei.school.restaurant.endpoint.rest.PriceRest;
-import edu.hei.school.restaurant.endpoint.rest.StockMovementRest;
+import edu.hei.school.restaurant.endpoint.rest.*;
+import edu.hei.school.restaurant.model.Dish;
 import edu.hei.school.restaurant.model.Ingredient;
 import edu.hei.school.restaurant.service.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,5 +47,26 @@ public class IngredientRestMapper {
             ingredient.addStockMovements(new ArrayList<>());
         }
         return ingredient;
+    }
+
+    @Component
+    @RequiredArgsConstructor
+    public static class DishRestMapper {
+
+        private final DishIngredientRestMapper dishIngredientRestMapper;
+
+        public DishRest toRest (Dish dish) {
+            List<DishIngredientRest> dishIngredients = dish.getDishIngredients().stream()
+                    .map(dishIngredient -> dishIngredientRestMapper.apply(dishIngredient))
+                    .toList();
+
+            return new DishRest(
+                    dish.getId(),
+                    dish.getName(),
+                    dish.getAvailableQuantity(),
+                    dish.getPrice(),
+                    dishIngredients
+            );
+        }
     }
 }
