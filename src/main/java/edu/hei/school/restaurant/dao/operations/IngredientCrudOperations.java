@@ -1,8 +1,11 @@
 package edu.hei.school.restaurant.dao.operations;
 
 import edu.hei.school.restaurant.dao.DataSource;
+import edu.hei.school.restaurant.dao.PostgresNextReference;
 import edu.hei.school.restaurant.model.Ingredient;
 import edu.hei.school.restaurant.dao.mapper.IngredientMapper;
+import edu.hei.school.restaurant.model.Price;
+import edu.hei.school.restaurant.model.StockMovement;
 import edu.hei.school.restaurant.service.exception.NotFoundException;
 import edu.hei.school.restaurant.service.exception.ServerException;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +26,7 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
     private final IngredientMapper ingredientMapper;
     private final PriceCrudOperations priceCrudOperations;
     private final StockMovementCrudOperations stockMovementCrudOperations;
+    final PostgresNextReference postgresNextReference = new PostgresNextReference();
 
     // TODO : default values for page and size
     @Override
@@ -66,31 +70,32 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
 
     @SneakyThrows
     @Override
-    public List<Ingredient> saveAll(List<Ingredient> entities) {
+    public List<Ingredient> saveAll(List<Ingredient> toSave) {
         List<Ingredient> ingredients = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement =
-                         connection.prepareStatement("insert into ingredient (id, name) values (?, ?)"
-                                 + " on conflict (id) do update set name=excluded.name"
-                                 + " returning id, name")) {
-                entities.forEach(entityToSave -> {
-                    try {
-                        statement.setLong(1, entityToSave.getId());
-                        statement.setString(2, entityToSave.getName());
-                        statement.addBatch(); // group by batch so executed as one query in database
-                    } catch (SQLException e) {
-                        throw new ServerException(e);
+            toSave.forEach(entityToSave -> {
+                try (PreparedStatement statement =
+                             connection.prepareStatement("insert into ingredient (id, name) values (?, ?)"
+                                     + " on conflict (id) do update set name=excluded.name"
+                                     + " returning id, name")) {
+                    long id = entityToSave.getId() == null ? postgresNextReference.nextID("entityToSave", connection) : entityToSave.getId();
+                    statement.setLong(1, id);
+                    statement.setString(2, entityToSave.getName());
+                    ResultSet resultSet = statement.executeQuery();
+
+                    if (resultSet.next()) {
+                        Ingredient savedIngredient = ingredientMapper.apply(resultSet);
+                        List<Price> prices = priceCrudOperations.saveAll(entityToSave.getPrices());
+                        List<StockMovement> stockMovements = stockMovementCrudOperations.saveAll(entityToSave.getStockMovements());
+                        savedIngredient.addPrices(prices);
+                        savedIngredient.addStockMovements(stockMovements);
+                        ingredients.add(savedIngredient);
                     }
-                    priceCrudOperations.saveAll((entityToSave.getPrices()));
-                    stockMovementCrudOperations.saveAll((entityToSave.getStockMovements()));
-                });
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        ingredients.add(ingredientMapper.apply(resultSet));
-                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
                 }
-                return ingredients;
-            }
+            });
         }
+        return ingredients;
     }
 }

@@ -1,6 +1,7 @@
 package edu.hei.school.restaurant.dao.operations;
 
 import edu.hei.school.restaurant.dao.DataSource;
+import edu.hei.school.restaurant.dao.PostgresNextReference;
 import edu.hei.school.restaurant.dao.mapper.StockMovementMapper;
 import edu.hei.school.restaurant.model.StockMovement;
 import edu.hei.school.restaurant.service.exception.ServerException;
@@ -15,6 +16,7 @@ import static java.time.Instant.now;
 
 @Repository
 public class StockMovementCrudOperations implements CrudOperations<StockMovement> {
+    final PostgresNextReference postgresNextReference = new PostgresNextReference();
     @Autowired
     private DataSource dataSource;
     @Autowired
@@ -35,14 +37,15 @@ public class StockMovementCrudOperations implements CrudOperations<StockMovement
         List<StockMovement> stockMovements = new ArrayList<>();
         String sql = """
                 insert into stock_movement (id, quantity, unit, movement_type, creation_datetime, id_ingredient)
-                values (?, ?, ?, ?, ?, ?)
+                values (?, ?, cast(? as unit) , cast(? as  stock_movement_type), ?, ?)
                 on conflict (id) do nothing returning id, quantity, unit, movement_type, creation_datetime, id_ingredient""";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
             entities.forEach(entityToSave -> {
                 try {
-                    statement.setLong(1, entityToSave.getId());
+                    long id = entityToSave.getId() == null ? postgresNextReference.nextID("stock_movement", connection) : entityToSave.getId();
+                    statement.setLong(1, id);
                     statement.setDouble(2, entityToSave.getQuantity());
                     statement.setString(3, entityToSave.getUnit().name());
                     statement.setString(4, entityToSave.getMovementType().name());

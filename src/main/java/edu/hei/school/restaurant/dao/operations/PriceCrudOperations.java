@@ -2,6 +2,7 @@ package edu.hei.school.restaurant.dao.operations;
 
 import edu.hei.school.restaurant.dao.DataSource;
 import edu.hei.school.restaurant.dao.mapper.PriceMapper;
+import edu.hei.school.restaurant.dao.PostgresNextReference;
 import edu.hei.school.restaurant.model.Price;
 import edu.hei.school.restaurant.service.exception.ServerException;
 import lombok.SneakyThrows;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Repository
 public class PriceCrudOperations implements CrudOperations<Price> {
+    final PostgresNextReference postgresNextReference = new PostgresNextReference();
     @Autowired
     private DataSource dataSource;
     @Autowired
@@ -40,7 +42,8 @@ public class PriceCrudOperations implements CrudOperations<Price> {
                              + " returning id, amount, date_value, id_ingredient");) {
             entities.forEach(entityToSave -> {
                 try {
-                    statement.setLong(1, entityToSave.getId());
+                    long id = entityToSave.getId() == null ? postgresNextReference.nextID("price", connection) : entityToSave.getId();
+                    statement.setLong(1, id);
                     statement.setDouble(2, entityToSave.getAmount());
                     statement.setDate(3, Date.valueOf(entityToSave.getDateValue()));
                     statement.setLong(4, entityToSave.getIngredient().getId());
