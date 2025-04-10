@@ -1,9 +1,6 @@
 package edu.hei.school.restaurant.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -14,19 +11,24 @@ import java.util.Optional;
 import static edu.hei.school.restaurant.model.StockMovementType.IN;
 import static edu.hei.school.restaurant.model.StockMovementType.OUT;
 
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
+@ToString
 public class Ingredient {
     private Long id;
     private String name;
+    @Setter(AccessLevel.PRIVATE)
     private List<Price> prices;
+    @Setter(AccessLevel.PRIVATE)
     private List<StockMovement> stockMovements;
 
     public List<StockMovement> addStockMovements(List<StockMovement> stockMovements) {
         stockMovements.forEach(stockMovement -> stockMovement.setIngredient(this));
-        if (getStockMovements() == null || getStockMovements().isEmpty()){
+        if (getStockMovements() == null || getStockMovements().isEmpty()) {
+            setStockMovements(stockMovements);
             return stockMovements;
         }
         getStockMovements().addAll(stockMovements);
@@ -34,10 +36,11 @@ public class Ingredient {
     }
 
     public List<Price> addPrices(List<Price> prices) {
-        if (getPrices() == null || getPrices().isEmpty()){
+        prices.forEach(price -> price.setIngredient(this));
+        if (getPrices() == null || getPrices().isEmpty()) {
+            setPrices(prices);
             return prices;
         }
-        prices.forEach(price -> price.setIngredient(this));
         getPrices().addAll(prices);
         return getPrices();
     }
