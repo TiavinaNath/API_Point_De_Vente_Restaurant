@@ -54,7 +54,7 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "select i.id, i.name, di.id as dish_ingredient_id, di.required_quantity, di.unit from ingredient i"
-                             + " join dish_ingredient di on i.id = di.id_ingredient"
+                             + " left join dish_ingredient di on i.id = di.id_ingredient"
                              + " where i.id = ?")) {
             statement.setLong(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
