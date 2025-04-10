@@ -25,6 +25,10 @@ public class Ingredient {
     @Setter(AccessLevel.PRIVATE)
     private List<StockMovement> stockMovements;
 
+    public Ingredient(String name) {
+        this.name = name;
+    }
+
     public List<StockMovement> addStockMovements(List<StockMovement> stockMovements) {
         stockMovements.forEach(stockMovement -> stockMovement.setIngredient(this));
         if (getStockMovements() == null || getStockMovements().isEmpty()) {

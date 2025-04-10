@@ -10,7 +10,7 @@ import java.util.List;
 public class DishRest {
     private Long id;
     private String name;
-    private Integer availableQuantity;
+    private Double availableQuantity;
     private Double actualPrice;
     private List<DishIngredientRest> ingredients;
 }

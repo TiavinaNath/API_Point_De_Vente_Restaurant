@@ -11,6 +11,8 @@ import java.util.List;
 public class IngredientRest {
     private Long id;
     private String name;
+    private Double actualPrice;
+    private Double availableQuantity;
     private List<PriceRest> prices;
     private List<StockMovementRest> stockMovements;
 }

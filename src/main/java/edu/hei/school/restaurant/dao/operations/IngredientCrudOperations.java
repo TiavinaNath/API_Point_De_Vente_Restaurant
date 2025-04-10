@@ -68,6 +68,25 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
         }
     }
 
+    public Ingredient findByName(String name) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(""" 
+                        select i.id, i.name from ingredient i where i.name ilike ? 
+               """
+             )) {
+            statement.setString(1, name);
+            System.out.println("Searching ingredient: " + name);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return ingredientMapper.apply(resultSet);
+                }
+                throw new NotFoundException("Ingredient.name=" + name + " not found");
+            }
+        } catch (SQLException e) {
+            throw new ServerException(e);
+        }
+    }
+
     @SneakyThrows
     @Override
     public List<Ingredient> saveAll(List<Ingredient> toSave) {

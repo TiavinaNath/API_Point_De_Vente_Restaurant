@@ -17,4 +17,10 @@ public class StockMovement {
     private Unit unit;
     private StockMovementType movementType;
     private Instant creationDatetime;
+
+    public StockMovement(Double quantity, Unit unit, StockMovementType movementType) {
+        this.quantity = quantity;
+        this.unit = unit;
+        this.movementType = movementType;
+    }
 }

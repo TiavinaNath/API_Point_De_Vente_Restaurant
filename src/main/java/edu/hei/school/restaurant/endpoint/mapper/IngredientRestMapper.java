@@ -25,7 +25,14 @@ public class IngredientRestMapper {
         List<StockMovementRest> stockMovementRests = ingredient.getStockMovements().stream()
                 .map(stockMovement -> stockMovementRestMapper.apply(stockMovement))
                 .toList();
-        return new IngredientRest(ingredient.getId(), ingredient.getName(), prices, stockMovementRests);
+        return new IngredientRest(
+                ingredient.getId(),
+                ingredient.getName(),
+                ingredient.getActualPrice(),
+                ingredient.getAvailableQuantity(),
+                prices,
+                stockMovementRests
+        );
     }
 
     public Ingredient toModel(CreateOrUpdateIngredient newIngredient) {

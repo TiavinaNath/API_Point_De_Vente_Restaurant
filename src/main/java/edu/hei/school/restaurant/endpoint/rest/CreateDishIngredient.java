@@ -1,13 +1,13 @@
 package edu.hei.school.restaurant.endpoint.rest;
 
+import edu.hei.school.restaurant.model.Unit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class IngredientBasicProperty {
-    private Long id;
+public class CreateDishIngredient {
     private String name;
-    private Double actualPrice;
-    private Double availableQuantity;
+    private Double requiredQuantity;
+    private Unit unit;
 }

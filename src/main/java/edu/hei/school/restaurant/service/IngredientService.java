@@ -3,6 +3,7 @@ package edu.hei.school.restaurant.service;
 import edu.hei.school.restaurant.dao.operations.IngredientCrudOperations;
 import edu.hei.school.restaurant.model.Ingredient;
 import edu.hei.school.restaurant.model.Price;
+import edu.hei.school.restaurant.model.StockMovement;
 import edu.hei.school.restaurant.service.exception.ClientException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -63,6 +64,13 @@ public class IngredientService {
     public Ingredient addPrices(Long ingredientId, List<Price> pricesToAdd) {
         Ingredient ingredient = ingredientCrudOperations.findById(ingredientId);
         ingredient.addPrices(pricesToAdd);
+        List<Ingredient> ingredientsSaved = ingredientCrudOperations.saveAll(List.of(ingredient));
+        return ingredientsSaved.getFirst();
+    }
+
+    public Ingredient addStockMovements(Long ingredientId, List<StockMovement> stockMovementsToAdd) {
+        Ingredient ingredient = ingredientCrudOperations.findById(ingredientId);
+        ingredient.addStockMovements(stockMovementsToAdd);
         List<Ingredient> ingredientsSaved = ingredientCrudOperations.saveAll(List.of(ingredient));
         return ingredientsSaved.getFirst();
     }

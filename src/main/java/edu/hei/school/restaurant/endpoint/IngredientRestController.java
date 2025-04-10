@@ -2,10 +2,12 @@ package edu.hei.school.restaurant.endpoint;
 
 import edu.hei.school.restaurant.endpoint.mapper.IngredientRestMapper;
 import edu.hei.school.restaurant.endpoint.rest.CreateIngredientPrice;
+import edu.hei.school.restaurant.endpoint.rest.CreateIngredientStockMovement;
 import edu.hei.school.restaurant.endpoint.rest.CreateOrUpdateIngredient;
 import edu.hei.school.restaurant.endpoint.rest.IngredientRest;
 import edu.hei.school.restaurant.model.Ingredient;
 import edu.hei.school.restaurant.model.Price;
+import edu.hei.school.restaurant.model.StockMovement;
 import edu.hei.school.restaurant.service.IngredientService;
 import edu.hei.school.restaurant.service.exception.ClientException;
 import edu.hei.school.restaurant.service.exception.NotFoundException;
@@ -70,6 +72,18 @@ public class IngredientRestController {
                         new Price(ingredientPrice.getAmount(), ingredientPrice.getDateValue()))
                 .toList();
         Ingredient ingredient = ingredientService.addPrices(ingredientId, prices);
+        IngredientRest ingredientRest = ingredientRestMapper.toRest(ingredient);
+        return ResponseEntity.ok().body(ingredientRest);
+    }
+
+    @PutMapping("ingredients/{ingredientId}/stockMovements")
+    public ResponseEntity<Object> updateIngredientStockMovement(@PathVariable Long ingredientId, @RequestBody List<CreateIngredientStockMovement> ingredientStockMovements) {
+        List<StockMovement> stockMovements = ingredientStockMovements.stream()
+                .map(ingredientStockMovement ->
+                        new StockMovement(ingredientStockMovement.getQuantity(), ingredientStockMovement.getUnit(), ingredientStockMovement.getMovementType()))
+                .toList();
+        System.out.println(stockMovements);
+        Ingredient ingredient = ingredientService.addStockMovements(ingredientId, stockMovements);
         IngredientRest ingredientRest = ingredientRestMapper.toRest(ingredient);
         return ResponseEntity.ok().body(ingredientRest);
     }
