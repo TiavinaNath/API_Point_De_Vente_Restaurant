@@ -29,8 +29,8 @@ public class IngredientMapper implements Function<ResultSet, Ingredient> {
         Ingredient ingredient = new Ingredient();
         ingredient.setId(idIngredient);
         ingredient.setName(resultSet.getString("name"));
-        ingredient.setPrices(ingredientPrices);
-        ingredient.setStockMovements(ingredientStockMovements);
+        ingredient.addPrices(ingredientPrices);
+        ingredient.addStockMovements(ingredientStockMovements);
         return ingredient;
     }
 }
