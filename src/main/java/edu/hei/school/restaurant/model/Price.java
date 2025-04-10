@@ -1,19 +1,17 @@
 package edu.hei.school.restaurant.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 import static java.time.LocalDate.now;
 
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
+@ToString(exclude = "ingredient")
 public class Price {
     private Long id;
     private Ingredient ingredient;
