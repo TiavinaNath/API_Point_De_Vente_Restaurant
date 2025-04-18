@@ -40,6 +40,7 @@ public class Order {
         this.orderStatusHistoryList = List.of(new OrderStatusHistory(StatusOrder.CREATED));
     }
 
+
     public StatusOrder getActualStatus() {
         return orderStatusHistoryList.stream()
                 .max(Comparator.comparing(OrderStatusHistory::getCreationDateTime))

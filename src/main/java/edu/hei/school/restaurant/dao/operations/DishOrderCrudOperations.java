@@ -3,9 +3,11 @@ package edu.hei.school.restaurant.dao.operations;
 import edu.hei.school.restaurant.dao.DataSource;
 import edu.hei.school.restaurant.dao.PostgresNextReference;
 import edu.hei.school.restaurant.dao.mapper.DishOrderMapper;
+import edu.hei.school.restaurant.dao.mapper.OrderMapper;
 import edu.hei.school.restaurant.model.Dish;
 import edu.hei.school.restaurant.model.DishOrder;
 import edu.hei.school.restaurant.model.DishOrderStatusHistory;
+import edu.hei.school.restaurant.model.Order;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Repository;
@@ -23,8 +25,9 @@ public class DishOrderCrudOperations {
     private final DataSource dataSource;
     private final DishOrderMapper dishOrderMapper;
     private final DishOrderStatusHistoryCrudOperations dishOrderStatusHistoryCrudOperations;
+    private final DishCrudOperations dishCrudOperations;
+    private final OrderStatusHistoryCrudOperations orderStatusHistoryCrudOperations;
     final PostgresNextReference postgresNextReference = new PostgresNextReference();
-
 
     public List<DishOrder> getDishOrdersByOrderId(Long idOrder) {
         List<DishOrder> dishOrders = new ArrayList<>();
@@ -89,6 +92,43 @@ public class DishOrderCrudOperations {
         }
 
         return savedDishOrders;
+    }
+
+    @SneakyThrows
+    public List<DishOrder> findAllDishOrdersWithStatusInProgressAndFinished () {
+        List<DishOrder> dishOrders = new ArrayList<>();
+        String sql = """
+                SELECT d.id, d.id_dish, d.id_order, d.quantity, o.reference
+                FROM dish_order d
+                JOIN "order" o ON o.id = d.id_order
+                WHERE d.id IN (
+                    SELECT id_dish_order
+                    FROM dish_order_status_history
+                    WHERE status IN ('IN_PROGRESS', 'FINISHED')
+                    GROUP BY id_dish_order
+                    HAVING COUNT(DISTINCT status) = 2
+                );
+                """;
+
+        try(Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                DishOrder dishOrder = new DishOrder();
+
+                Order order = new Order();
+                order.setOrderStatusHistoryList(orderStatusHistoryCrudOperations.getOrderStatusHistoryByIdOrder(resultSet.getLong("id_order")));
+
+                dishOrder.setId(resultSet.getLong("id"));
+                dishOrder.setDish(dishCrudOperations.findById(resultSet.getLong("id_dish")));
+                dishOrder.setOrder(order);
+                dishOrder.setQuantity(resultSet.getDouble("quantity"));
+                dishOrder.setDishOrderStatusHistoryList(dishOrderStatusHistoryCrudOperations.getDishOrderStatusHistoryByDishOrderId(resultSet.getLong("id")));
+                dishOrders.add(dishOrder);
+            }
+        }
+        return dishOrders;
     }
 
 }
