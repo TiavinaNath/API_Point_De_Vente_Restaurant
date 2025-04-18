@@ -20,4 +20,10 @@ public class DishIngredient {
         this.requiredQuantity = requiredQuantity;
         this.unit = unit;
     }
+
+    public DishIngredient(Long id, Ingredient ingredient, Double requiredQuantity) {
+        this.id = id;
+        this.ingredient = ingredient;
+        this.requiredQuantity = requiredQuantity;
+    }
 }

@@ -50,7 +50,7 @@ public class DishRestController {
     public ResponseEntity<Object> updateDishIngredients(@PathVariable Long dishId, @RequestBody List<CreateDishIngredient> dishIngredientsToCreate) {
         List<DishIngredient> dishIngredients = dishIngredientsToCreate.stream()
                 .map(dishIngredient ->
-                        new DishIngredient(new Ingredient(dishIngredient.getName()), dishIngredient.getRequiredQuantity(), dishIngredient.getUnit()))
+                        new DishIngredient(dishIngredient.getId(), new Ingredient(dishIngredient.getName()), dishIngredient.getRequiredQuantity(), dishIngredient.getUnit()))
                 .toList();
         Dish dish = dishService.addDishIngredients(dishId, dishIngredients);
         DishRest dishRest = dishRestMapper.toRest(dish);

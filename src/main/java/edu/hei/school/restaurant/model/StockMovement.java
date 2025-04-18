@@ -23,4 +23,12 @@ public class StockMovement {
         this.unit = unit;
         this.movementType = movementType;
     }
+
+    public StockMovement(Long id, Double quantity, Unit unit, StockMovementType movementType, Instant creationDatetime) {
+        this.id = id;
+        this.quantity = quantity;
+        this.unit = unit;
+        this.movementType = movementType;
+        this.creationDatetime = creationDatetime;
+    }
 }

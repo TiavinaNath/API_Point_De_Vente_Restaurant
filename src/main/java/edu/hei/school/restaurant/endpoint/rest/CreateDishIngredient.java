@@ -7,7 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class CreateDishIngredient {
-    private String name;
+    private Long id;
     private Double requiredQuantity;
     private Unit unit;
+    private String name;
+
 }

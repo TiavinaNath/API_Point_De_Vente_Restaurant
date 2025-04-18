@@ -27,4 +27,10 @@ public class Price {
         this.amount = amount;
         this.dateValue = dateValue;
     }
+
+    public Price(Long id, Double amount, LocalDate dateValue) {
+        this.id = id;
+        this.amount = amount;
+        this.dateValue = dateValue;
+    }
 }

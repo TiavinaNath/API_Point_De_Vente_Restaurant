@@ -29,6 +29,11 @@ public class Ingredient {
         this.name = name;
     }
 
+    public Ingredient(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public List<StockMovement> addStockMovements(List<StockMovement> stockMovements) {
         stockMovements.forEach(stockMovement -> stockMovement.setIngredient(this));
         if (getStockMovements() == null || getStockMovements().isEmpty()) {

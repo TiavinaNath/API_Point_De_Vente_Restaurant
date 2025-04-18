@@ -21,6 +21,10 @@ public class OrderService {
        return orderCrudOperations.getAll(1, 500);
     }
 
+    public List<Order> saveOrders(List<Order> orders) {
+        return orderCrudOperations.saveAll(orders);
+    }
+
     public Order findOrderByReference(String reference) {
         return orderCrudOperations.findByReference(reference);
     }

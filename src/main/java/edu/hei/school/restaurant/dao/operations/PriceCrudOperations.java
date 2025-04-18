@@ -35,31 +35,40 @@ public class PriceCrudOperations implements CrudOperations<Price> {
     @Override
     public List<Price> saveAll(List<Price> entities) {
         List<Price> prices = new ArrayList<>();
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement =
-                     connection.prepareStatement("insert into price (id, amount, date_value, id_ingredient) values (?, ?, ?, ?)"
-                             + " on conflict (id) do nothing"
-                             + " returning id, amount, date_value, id_ingredient");) {
-            entities.forEach(entityToSave -> {
-                try {
-                    long id = entityToSave.getId() == null ? postgresNextReference.nextID("price", connection) : entityToSave.getId();
+        String sql = """
+            INSERT INTO price (
+                id, amount, date_value, id_ingredient
+            )
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT (id) DO NOTHING
+            RETURNING id, amount, date_value, id_ingredient
+            """;
+
+        try (Connection connection = dataSource.getConnection()) {
+            for (Price entityToSave : entities) {
+                try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                    long id = entityToSave.getId() == null
+                            ? postgresNextReference.nextID("price", connection)
+                            : entityToSave.getId();
+
                     statement.setLong(1, id);
                     statement.setDouble(2, entityToSave.getAmount());
                     statement.setDate(3, Date.valueOf(entityToSave.getDateValue()));
                     statement.setLong(4, entityToSave.getIngredient().getId());
-                    statement.addBatch(); // group by batch so executed as one query in database
-                } catch (SQLException e) {
-                    throw new ServerException(e);
-                }
-            });
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    prices.add(priceMapper.apply(resultSet));
+
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        while (resultSet.next()) {
+                            prices.add(priceMapper.apply(resultSet));
+                        }
+                    }
                 }
             }
             return prices;
+        } catch (SQLException e) {
+            throw new ServerException(e);
         }
     }
+
 
     public List<Price> findByIdIngredient(Long idIngredient) {
         List<Price> prices = new ArrayList<>();

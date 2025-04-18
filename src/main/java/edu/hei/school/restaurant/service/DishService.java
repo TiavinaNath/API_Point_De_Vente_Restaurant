@@ -24,6 +24,13 @@ public class DishService {
         Dish dish = dishCrudOperations.findById(dishId);
         for(DishIngredient dishIngredient: dishIngredients) {
             Ingredient ingredient = ingredientCrudOperations.findByName(dishIngredient.getIngredient().getName());
+            if (ingredient == null) {
+                List<Ingredient> ingredientToSave = List.of(new Ingredient(
+                        dishIngredient.getId(),
+                        dishIngredient.getIngredient().getName()
+                ));
+                ingredient = ingredientCrudOperations.saveAll(ingredientToSave).getFirst();
+            }
             dishIngredient.setIngredient(ingredient);
         }
         dish.addDishIngrendients(dishIngredients);

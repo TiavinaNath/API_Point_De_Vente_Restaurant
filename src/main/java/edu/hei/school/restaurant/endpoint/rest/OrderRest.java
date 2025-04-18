@@ -11,6 +11,7 @@ import java.util.List;
 public class OrderRest {
     private Long id;
     private String reference;
+    private Double totalAmount;
     private List<DishOrderRest> dishOrders;
     private StatusOrder actualStatus;
 }

@@ -36,29 +36,35 @@ public class StockMovementCrudOperations implements CrudOperations<StockMovement
     public List<StockMovement> saveAll(List<StockMovement> entities) {
         List<StockMovement> stockMovements = new ArrayList<>();
         String sql = """
-                insert into stock_movement (id, quantity, unit, movement_type, creation_datetime, id_ingredient)
-                values (?, ?, cast(? as unit) , cast(? as  stock_movement_type), ?, ?)
-                on conflict (id) do nothing returning id, quantity, unit, movement_type, creation_datetime, id_ingredient""";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement =
-                     connection.prepareStatement(sql)) {
-            entities.forEach(entityToSave -> {
-                try {
-                    long id = entityToSave.getId() == null ? postgresNextReference.nextID("stock_movement", connection) : entityToSave.getId();
+            INSERT INTO stock_movement (
+                id, quantity, unit, movement_type, creation_datetime, id_ingredient
+            )
+            VALUES (?, ?, CAST(? AS unit), CAST(? AS stock_movement_type), ?, ?)
+            ON CONFLICT (id) DO NOTHING
+            RETURNING id, quantity, unit, movement_type, creation_datetime, id_ingredient
+            """;
+
+        try (Connection connection = dataSource.getConnection()) {
+            for (StockMovement entityToSave : entities) {
+                try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                    long id = entityToSave.getId() == null
+                            ? postgresNextReference.nextID("stock_movement", connection)
+                            : entityToSave.getId();
+
                     statement.setLong(1, id);
                     statement.setDouble(2, entityToSave.getQuantity());
                     statement.setString(3, entityToSave.getUnit().name());
                     statement.setString(4, entityToSave.getMovementType().name());
-                    statement.setTimestamp(5, Timestamp.from(now()));
+                    statement.setTimestamp(5, entityToSave.getCreationDatetime() == null
+                            ? Timestamp.from(now())
+                            : Timestamp.from(entityToSave.getCreationDatetime()));
                     statement.setLong(6, entityToSave.getIngredient().getId());
-                    statement.addBatch(); // group by batch so executed as one query in database
-                } catch (SQLException e) {
-                    throw new ServerException(e);
-                }
-            });
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    stockMovements.add(stockMovementMapper.apply(resultSet));
+
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        while (resultSet.next()) {
+                            stockMovements.add(stockMovementMapper.apply(resultSet));
+                        }
+                    }
                 }
             }
             return stockMovements;
@@ -66,6 +72,7 @@ public class StockMovementCrudOperations implements CrudOperations<StockMovement
             throw new ServerException(e);
         }
     }
+
 
     public List<StockMovement> findByIdIngredient(Long idIngredient) {
         List<StockMovement> stockMovements = new ArrayList<>();

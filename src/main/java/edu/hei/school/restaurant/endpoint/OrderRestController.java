@@ -77,4 +77,10 @@ public class OrderRestController {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
+    @PostMapping("orders/{reference}")
+    public ResponseEntity<Object> createOrder(@PathVariable String reference) {
+        Order order = new Order(reference);
+        return ResponseEntity.ok().body(orderRestMapper.toRest(orderService.saveOrders(List.of(order)).getFirst()));
+    }
 }

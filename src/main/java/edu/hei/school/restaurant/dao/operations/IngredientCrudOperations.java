@@ -80,7 +80,8 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
                 if (resultSet.next()) {
                     return ingredientMapper.apply(resultSet);
                 }
-                throw new NotFoundException("Ingredient.name=" + name + " not found");
+//                throw new NotFoundException("Ingredient.name=" + name + " not found");
+                    return null;
             }
         } catch (SQLException e) {
             throw new ServerException(e);
@@ -90,6 +91,7 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
     @SneakyThrows
     @Override
     public List<Ingredient> saveAll(List<Ingredient> toSave) {
+        System.out.println(toSave);
         List<Ingredient> ingredients = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             toSave.forEach(entityToSave -> {
@@ -97,15 +99,15 @@ public class IngredientCrudOperations implements CrudOperations<Ingredient> {
                              connection.prepareStatement("insert into ingredient (id, name) values (?, ?)"
                                      + " on conflict (id) do update set name=excluded.name"
                                      + " returning id, name")) {
-                    long id = entityToSave.getId() == null ? postgresNextReference.nextID("entityToSave", connection) : entityToSave.getId();
+                    long id = entityToSave.getId() == null ? postgresNextReference.nextID("ingredient", connection) : entityToSave.getId();
                     statement.setLong(1, id);
                     statement.setString(2, entityToSave.getName());
                     ResultSet resultSet = statement.executeQuery();
 
-                    if (resultSet.next()) {
+                    while (resultSet.next()) {
                         Ingredient savedIngredient = ingredientMapper.apply(resultSet);
-                        List<Price> prices = priceCrudOperations.saveAll(entityToSave.getPrices());
-                        List<StockMovement> stockMovements = stockMovementCrudOperations.saveAll(entityToSave.getStockMovements());
+                        List<Price> prices = priceCrudOperations.saveAll(entityToSave.getPrices() == null? new ArrayList<>() : entityToSave.getPrices());
+                        List<StockMovement> stockMovements = stockMovementCrudOperations.saveAll(entityToSave.getStockMovements() == null? new ArrayList<>() : entityToSave.getStockMovements());
                         savedIngredient.addPrices(prices);
                         savedIngredient.addStockMovements(stockMovements);
                         ingredients.add(savedIngredient);

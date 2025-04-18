@@ -22,6 +22,7 @@ public class OrderRestMapper {
         return new OrderRest(
                 order.getId(),
                 order.getReference(),
+                order.getTotalAmount(),
                 dishOrderRests,
                 order.getActualStatus()
         );
