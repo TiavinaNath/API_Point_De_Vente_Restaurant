@@ -32,7 +32,7 @@ public class OrderService {
     public Order updateDishOrders(String reference, List<DishOrder> dishOrders) {
         Order order = orderCrudOperations.findByReference(reference);
         for(DishOrder dishOrder: dishOrders) {
-            Dish dish = dishCrudOperations.findByName(dishOrder.getDish().getName());
+            Dish dish = dishCrudOperations.findById(dishOrder.getDish().getId());
             dishOrder.setDish(dish);
         }
         order.updateDishOrders(dishOrders);
@@ -43,7 +43,7 @@ public class OrderService {
     public Order updateDishOrdersThenConfirm(String reference, List<DishOrder> dishOrders) {
         Order order = orderCrudOperations.findByReference(reference);
         for(DishOrder dishOrder: dishOrders) {
-            Dish dish = dishCrudOperations.findByName(dishOrder.getDish().getName());
+            Dish dish = dishCrudOperations.findById(dishOrder.getDish().getId());
             dishOrder.setDish(dish);
         }
         order.updateDishOrders(dishOrders);

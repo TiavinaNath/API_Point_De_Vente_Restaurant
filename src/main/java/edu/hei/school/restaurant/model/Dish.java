@@ -32,6 +32,10 @@ public class Dish {
         this.name = name;
     }
 
+    public Dish(Long id) {
+        this.id = id;
+    }
+
     public Double getTotalIngredientsCost() {
         return dishIngredients.stream()
                 .map(dishIngredient -> {

@@ -9,6 +9,6 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class UpdateOrder {
-    private List<UpdateOrderDishOrder> dishOrders;
-    private StatusOrder statusOrder;
+    private List<UpdateOrderDishOrder> dishes;
+    private StatusOrder orderStatus;
 }

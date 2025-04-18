@@ -46,15 +46,15 @@ public class OrderRestController {
 
     @PutMapping("/orders/{reference}/dishes")
     public ResponseEntity<Object> updateOrder(@PathVariable String reference, @RequestBody UpdateOrder orderDishOrders) {
-        if (!orderDishOrders.getStatusOrder().equals(StatusOrder.CREATED) && !orderDishOrders.getStatusOrder().equals(StatusOrder.CONFIRMED)) {
+        if (!orderDishOrders.getOrderStatus().equals(StatusOrder.CREATED) && !orderDishOrders.getOrderStatus().equals(StatusOrder.CONFIRMED)) {
             return ResponseEntity.badRequest().body("Status should be CREATED or CONFIRMED");
         }
-        List<DishOrder> dishOrders = orderDishOrders.getDishOrders().stream()
+        List<DishOrder> dishOrders = orderDishOrders.getDishes().stream()
                 .map(dishOrder -> new DishOrder(
-                        new Dish(dishOrder.getDishName()), dishOrder.getQuantity()
+                        new Dish(dishOrder.getDishIdentifier()), dishOrder.getQuantityOrdered()
                 ))
                 .toList();
-        if (orderDishOrders.getStatusOrder().equals(StatusOrder.CONFIRMED)) {
+        if (orderDishOrders.getOrderStatus().equals(StatusOrder.CONFIRMED)) {
             Order order  = orderService.updateDishOrdersThenConfirm(reference, dishOrders);
             OrderRest orderRest = orderRestMapper.toRest(order);
             return ResponseEntity.ok().body(orderRest);

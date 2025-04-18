@@ -149,13 +149,19 @@ public class Order {
     public List<DishOrder> updateDishOrders(List<DishOrder> dishOrders) {
         dishOrders.forEach(dishOrder -> dishOrder.setOrder(this));
         if (getDishOrderList() == null || getDishOrderList().isEmpty()) {
-            setDishOrderList(dishOrders);
+            List<DishOrder> dishOrderWithStatus = dishOrders.stream()
+                    .map(e -> {
+                        e.setDishOrderStatusHistoryList(List.of(new DishOrderStatusHistory(StatusDishOrder.CREATED)));
+                        return e;
+                    })
+                    .toList();
+            setDishOrderList(dishOrderWithStatus);
             return dishOrders;
         }
         for (DishOrder dishOrder : dishOrders) {
             boolean updated = false;
             for (DishOrder existingDishOrder : getDishOrderList()) {
-                if (existingDishOrder.getDish().getName().equals(dishOrder.getDish().getName())) {
+                if (existingDishOrder.getDish().getId().equals(dishOrder.getDish().getId())) {
                     existingDishOrder.setQuantity(dishOrder.getQuantity());
                     updated = true;
                     break;

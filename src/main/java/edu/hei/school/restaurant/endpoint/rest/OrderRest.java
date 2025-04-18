@@ -12,6 +12,6 @@ public class OrderRest {
     private Long id;
     private String reference;
     private Double totalAmount;
-    private List<DishOrderRest> dishOrders;
+    private List<DishOrderRest> dishes;
     private StatusOrder actualStatus;
 }

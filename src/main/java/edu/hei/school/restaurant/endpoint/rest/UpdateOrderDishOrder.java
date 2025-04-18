@@ -6,6 +6,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class UpdateOrderDishOrder {
-    private String dishName;
-    private Double quantity;
+    private Long dishIdentifier;
+    private Double quantityOrdered;
 }
