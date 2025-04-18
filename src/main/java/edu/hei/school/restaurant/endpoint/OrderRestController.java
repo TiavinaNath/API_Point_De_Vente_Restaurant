@@ -3,6 +3,7 @@ package edu.hei.school.restaurant.endpoint;
 import edu.hei.school.restaurant.endpoint.mapper.OrderRestMapper;
 import edu.hei.school.restaurant.endpoint.rest.IngredientRest;
 import edu.hei.school.restaurant.endpoint.rest.OrderRest;
+import edu.hei.school.restaurant.endpoint.rest.UpdateDishOrderStatus;
 import edu.hei.school.restaurant.endpoint.rest.UpdateOrder;
 import edu.hei.school.restaurant.model.*;
 import edu.hei.school.restaurant.service.OrderService;
@@ -65,8 +66,8 @@ public class OrderRestController {
         }
     }
 
-    @PutMapping("/orders/{reference}/dishes/{dishId}")
-    public ResponseEntity<Object> updateDishOrderStatus(@PathVariable String reference, @PathVariable Long dishId) {
+/*    @PutMapping("/orders/{reference}/dishes/{dishId}")
+    public ResponseEntity<Object> updateDishOrderStatus(@PathVariable String reference, @PathVariable Long dishId ) {
         try {
             return ResponseEntity.ok().body(orderRestMapper.toRest(orderService.updateDishOrderStatusByDishId(reference, dishId )));
         } catch (ClientException e) {
@@ -76,9 +77,28 @@ public class OrderRestController {
         } catch (ServerException e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
+    }*/
+
+
+    @PutMapping("/orders/{reference}/dishes/{dishId}")
+    public ResponseEntity<Object> changeDishOrderStatus(
+            @PathVariable String reference,
+            @PathVariable Long dishId,
+            @RequestBody UpdateDishOrderStatus dishOrderStatus
+    ) {
+        try {
+            return ResponseEntity.ok().body(orderRestMapper.toRest(orderService.updateDishOrderStatusByDishId(reference, dishId, dishOrderStatus)));
+        } catch (ClientException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
+        } catch (ServerException e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 
-    @PostMapping("orders/{reference}")
+
+@PostMapping("orders/{reference}")
     public ResponseEntity<Object> createOrder(@PathVariable String reference) {
         Order order = new Order(reference);
         return ResponseEntity.ok().body(orderRestMapper.toRest(orderService.saveOrders(List.of(order)).getFirst()));
