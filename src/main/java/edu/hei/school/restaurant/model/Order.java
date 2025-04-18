@@ -43,7 +43,7 @@ public class Order {
     public StatusOrder getActualStatus() {
         return orderStatusHistoryList.stream()
                 .max(Comparator.comparing(OrderStatusHistory::getCreationDateTime))
-                .orElseThrow()
+                .orElse(new OrderStatusHistory(StatusOrder.CREATED))
                 .getStatus();
     }
 
@@ -80,13 +80,14 @@ public class Order {
                 if (available < required) {
                     double missingQuantity = required - available;
 
-                    missingIngredientsDetails.add(String.format("Il manque %.2f(%s) %s(s) nécessaire(s) pour fabriquer %d %s",
+                    missingIngredientsDetails.add(String.format("Il manque %.2f(%s) %s(s) nécessaire(s) pour fabriquer %.2f %s",
                             missingQuantity,
                             dishIngredient.getUnit(),
                             dishIngredient.getIngredient().getName(),
                             quantity,
                             dish.getName()
                     ));
+
                 }
             }
         }

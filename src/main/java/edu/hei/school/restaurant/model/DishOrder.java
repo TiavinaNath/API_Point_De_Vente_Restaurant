@@ -28,7 +28,8 @@ public class DishOrder {
     public StatusDishOrder getActualStatus() {
         return dishOrderStatusHistoryList.stream()
                 .max(Comparator.comparing(DishOrderStatusHistory::getCreationDateTime))
-                .orElseThrow().getStatus();
+                .orElse(new DishOrderStatusHistory(StatusDishOrder.CREATED))
+                .getStatus();
     }
 
     public double getTotalPrice() {

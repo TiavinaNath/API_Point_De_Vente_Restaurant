@@ -27,24 +27,6 @@ public class IngredientRestController {
     private final IngredientService ingredientService;
     private final IngredientRestMapper ingredientRestMapper;
 
-    @GetMapping("/ingredients")
-    public ResponseEntity<Object> getIngredients(@RequestParam(name = "priceMinFilter", required = false) Double priceMinFilter,
-                                                 @RequestParam(name = "priceMaxFilter", required = false) Double priceMaxFilter) {
-        try {
-            List<Ingredient> ingredientsByPrices = ingredientService.getIngredientsByPrices(priceMinFilter, priceMaxFilter);
-            List<IngredientRest> ingredientRests = ingredientsByPrices.stream()
-                    .map(ingredient -> ingredientRestMapper.toRest(ingredient))
-                    .toList();
-            return ResponseEntity.ok().body(ingredientRests);
-        } catch (ClientException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
-        } catch (ServerException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
-    }
-
     @PostMapping("/ingredients")
     public ResponseEntity<Object> addIngredients() {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -60,6 +42,37 @@ public class IngredientRestController {
                     .map(ingredient -> ingredientRestMapper.toRest(ingredient))
                     .toList();
             return ResponseEntity.ok().body(ingredientsRest);
+        } catch (ServerException e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/ingredients/{id}")
+    public ResponseEntity<Object> getIngredient(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok().body(ingredientRestMapper.toRest(ingredientService.getById(id)));
+        } catch (ClientException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
+        } catch (ServerException e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/ingredients")
+    public ResponseEntity<Object> getIngredients(@RequestParam(name = "priceMinFilter", required = false) Double priceMinFilter,
+                                                 @RequestParam(name = "priceMaxFilter", required = false) Double priceMaxFilter) {
+        try {
+            List<Ingredient> ingredientsByPrices = ingredientService.getIngredientsByPrices(priceMinFilter, priceMaxFilter);
+            List<IngredientRest> ingredientRests = ingredientsByPrices.stream()
+                    .map(ingredient -> ingredientRestMapper.toRest(ingredient))
+                    .toList();
+            return ResponseEntity.ok().body(ingredientRests);
+        } catch (ClientException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
         } catch (ServerException e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
@@ -86,18 +99,5 @@ public class IngredientRestController {
         Ingredient ingredient = ingredientService.addStockMovements(ingredientId, stockMovements);
         IngredientRest ingredientRest = ingredientRestMapper.toRest(ingredient);
         return ResponseEntity.ok().body(ingredientRest);
-    }
-
-    @GetMapping("/ingredients/{id}")
-    public ResponseEntity<Object> getIngredient(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok().body(ingredientRestMapper.toRest(ingredientService.getById(id)));
-        } catch (ClientException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
-        } catch (ServerException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
     }
 }
