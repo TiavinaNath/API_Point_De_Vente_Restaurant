@@ -99,40 +99,13 @@ public class OrderService {
         newStatusHistory.setStatus(nextStatus);
         dishOrder.updateStatus(newStatusHistory);
 
+        if (statusDishOrder.getStatus().equals(StatusDishOrder.IN_PROGRESS) && order.getActualStatus().equals(StatusOrder.CONFIRMED)) {
+            order.updateStatus(new OrderStatusHistory(StatusOrder.IN_PROGRESS));
+        } else order.updateOrderStatusIfAllDishesCompleted();
+
         Order orderToReturn = orderCrudOperations.saveAll(List.of(order)).getFirst();
 
         return orderToReturn;
     }
-   /* public Order updateStatusDishOrder(String reference, Long idDish, StatusDishOrder givenDishOrderStatus) {
-        Order order = orderCrudOperations.findByReference(reference);
 
-        boolean dishFound = false;
-
-        if (order.getDishOrderList() != null) {
-            for (DishOrder dishOrder : order.getDishOrderList()) {
-                dishOrder.setOrder(order);
-                if (dishOrder.getDish().getId().equals(idDish)) {
-                    dishOrder.updateStatus(new DishOrderStatusHistory(givenDishOrderStatus));
-                    dishFound = true;
-
-                    if (givenDishOrderStatus.equals(StatusDishOrder.FINISHED) ||
-                            givenDishOrderStatus.equals(StatusDishOrder.DELIVERED)) {
-                        order.updateOrderStatusFromDishes();
-                    }
-                }
-            }
-        }
-
-        if (!dishFound) {
-            throw new IllegalArgumentException("Le plat avec l'ID " + idDish +
-                    " n'a pas été trouvé dans la commande " + reference);
-        }
-
-        if (givenDishOrderStatus.equals(StatusDishOrder.IN_PROGRESS) &&
-                !order.getActualStatus().equals(StatusOrder.IN_PROGRESS)) {
-            order.addOrderStatus(StatusOrder.IN_PROGRESS);
-        }
-
-        return orderCrudOperations.saveAll(List.of(order)).getFirst();
-    }*/
 }

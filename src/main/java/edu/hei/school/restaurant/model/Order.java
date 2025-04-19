@@ -115,6 +115,20 @@ public class Order {
         System.out.println("Commande validée avec succès !");
     }
 
+    public void switchToInProgress() {
+        if (!getActualStatus().equals(StatusOrder.CONFIRMED)) {
+            throw new IllegalStateException("La commande doit être en statut CONFIRMÉ pour être en préparation");
+        }
+
+        this.getOrderStatusHistoryList().add(new OrderStatusHistory(StatusOrder.IN_PROGRESS));
+
+        for (DishOrder dishOrder : dishOrderList) {
+            dishOrder.updateStatus(new DishOrderStatusHistory(StatusDishOrder.IN_PROGRESS));
+        }
+
+        System.out.println("La commande est en préparation");
+    }
+
     public OrderStatusHistory updateStatus(OrderStatusHistory newStatusHistory) {
         StatusOrder currentStatus = this.getActualStatus();
         StatusOrder newStatus = newStatusHistory.getStatus();
@@ -173,4 +187,21 @@ public class Order {
         }
         return getDishOrderList();
     }
+
+    public void updateOrderStatusIfAllDishesCompleted() {
+        boolean allFinished = dishOrderList.stream()
+                .allMatch(dishOrder -> dishOrder.getActualStatus() == StatusDishOrder.FINISHED);
+
+        boolean allDelivered = dishOrderList.stream()
+                .allMatch(dishOrder -> dishOrder.getActualStatus() == StatusDishOrder.DELIVERED);
+
+        if (allDelivered && getActualStatus() != StatusOrder.DELIVERED) {
+            this.updateStatus(new OrderStatusHistory(StatusOrder.DELIVERED));
+            System.out.println("Commande livrée !");
+        } else if (allFinished && getActualStatus() != StatusOrder.FINISHED) {
+            this.updateStatus(new OrderStatusHistory(StatusOrder.FINISHED));
+            System.out.println("Commande terminée !");
+        }
+    }
+
 }
