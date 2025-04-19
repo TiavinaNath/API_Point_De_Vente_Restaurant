@@ -61,10 +61,13 @@ public class IngredientRestController {
     }
 
     @GetMapping("/ingredients")
-    public ResponseEntity<Object> getIngredients(@RequestParam(name = "priceMinFilter", required = false) Double priceMinFilter,
-                                                 @RequestParam(name = "priceMaxFilter", required = false) Double priceMaxFilter) {
+    public ResponseEntity<Object> getIngredients(
+            @RequestParam(name = "priceMinFilter", required = false) Double priceMinFilter,
+            @RequestParam(name = "priceMaxFilter", required = false) Double priceMaxFilter,
+            @RequestParam(name = "page", required = false) Integer page,
+            @RequestParam(name = "pageSize", required = false) Integer pageSize) {
         try {
-            List<Ingredient> ingredientsByPrices = ingredientService.getIngredientsByPrices(priceMinFilter, priceMaxFilter);
+            List<Ingredient> ingredientsByPrices = ingredientService.getIngredientsByPrices(priceMinFilter, priceMaxFilter, page, pageSize);
             List<IngredientRest> ingredientRests = ingredientsByPrices.stream()
                     .map(ingredient -> ingredientRestMapper.toRest(ingredient))
                     .toList();

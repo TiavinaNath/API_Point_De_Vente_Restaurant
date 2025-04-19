@@ -32,7 +32,7 @@ public class DishRestController {
             @RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "pageSize", required = false) Integer pageSize) {
         try {
-            List<Dish> dishes = dishService.getDishes();
+            List<Dish> dishes = dishService.getDishes(page, pageSize);
             List<DishRest> dishRests = dishes.stream()
                     .map(dish -> dishRestMapper.toRest(dish))
                     .toList();
@@ -56,6 +56,4 @@ public class DishRestController {
         DishRest dishRest = dishRestMapper.toRest(dish);
         return ResponseEntity.ok().body(dishRest);
     }
-
-
 }

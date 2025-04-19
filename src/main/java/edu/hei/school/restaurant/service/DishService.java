@@ -16,8 +16,11 @@ public class DishService {
     private final DishCrudOperations dishCrudOperations;
     private final IngredientCrudOperations ingredientCrudOperations;
 
-    public List<Dish> getDishes () {
-        return dishCrudOperations.getAll(1, 500);
+    public List<Dish> getDishes (Integer page, Integer pageSize) {
+        int actualPage = (page == null || page < 0) ? 1: page;
+        int actualSize = (pageSize == null || pageSize <= 0) ? 500: pageSize;
+        return dishCrudOperations.getAll(actualPage, actualSize);
+
     }
 
     public Dish addDishIngredients(Long dishId, List<DishIngredient> dishIngredients) {

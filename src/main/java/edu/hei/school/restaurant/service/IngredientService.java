@@ -17,7 +17,7 @@ import java.util.List;
 public class IngredientService {
     private final IngredientCrudOperations ingredientCrudOperations;
 
-    public List<Ingredient> getIngredientsByPrices(Double priceMinFilter, Double priceMaxFilter) {
+    public List<Ingredient> getIngredientsByPrices(Double priceMinFilter, Double priceMaxFilter, Integer page, Integer pageSize) {
         if (priceMinFilter != null && priceMinFilter < 0) {
             throw new ClientException("PriceMinFilter " + priceMinFilter + " is negative");
         }
@@ -29,8 +29,10 @@ public class IngredientService {
                 throw new ClientException("PriceMinFilter " + priceMinFilter + " is greater than PriceMaxFilter " + priceMaxFilter);
             }
         }
-        // TODO : paginate from restController OR filter from repository directly
-        List<Ingredient> ingredients = ingredientCrudOperations.getAll(1, 500);
+
+        int actualPage = (page == null || page < 0) ? 1: page;
+        int actualSize = (pageSize == null || pageSize <= 0) ? 500: pageSize;
+        List<Ingredient> ingredients = ingredientCrudOperations.getAll(actualPage, actualSize);
 
         return ingredients.stream()
                 .filter(ingredient -> {
