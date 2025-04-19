@@ -34,9 +34,13 @@ public class DishService {
                 ));
                 ingredient = ingredientCrudOperations.saveAll(ingredientToSave).getFirst();
             }
+            System.out.println(ingredient);
             dishIngredient.setIngredient(ingredient);
+            System.out.println(dishIngredient);
         }
+
         dish.addDishIngrendients(dishIngredients);
+        System.out.println(dish);
         List<Dish> dishesSaved = dishCrudOperations.saveAll(List.of(dish));
         return dishesSaved.getFirst();
     }

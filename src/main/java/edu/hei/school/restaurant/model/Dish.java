@@ -76,11 +76,12 @@ public class Dish {
         return allQuantitiesPossible.stream().min(Double::compare).orElse(0.0);
     }
 
-    public List<DishIngredient> addDishIngrendients(List<DishIngredient> dishIngredients) {
-        if (getDishIngredients() == null || getDishIngredients().isEmpty()){
-            return dishIngredients;
+    public List<DishIngredient> addDishIngrendients(List<DishIngredient> newDishIngredients) {
+        if (this.dishIngredients == null) {
+            this.dishIngredients = new ArrayList<>(newDishIngredients);
+        } else {
+            this.dishIngredients.addAll(newDishIngredients);
         }
-        getDishIngredients().addAll(dishIngredients);
-        return getDishIngredients();
+        return this.dishIngredients;
     }
 }

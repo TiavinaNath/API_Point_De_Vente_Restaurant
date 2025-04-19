@@ -42,7 +42,7 @@ WHERE id_dish_order IN (
     FROM dish_order dio
              JOIN "order" o ON o.id = dio.id_order
              JOIN dish d ON d.id = dio.id_dish
-    WHERE o.reference = 'CMD-001' AND d.name = 'Hot Dog'
+    WHERE o.reference = 'CMD-001' AND d.name = 'Hot dog'
 )
   AND status = 'IN_PROGRESS';
 
@@ -53,7 +53,7 @@ WHERE id_dish_order IN (
     FROM dish_order dio
              JOIN "order" o ON o.id = dio.id_order
              JOIN dish d ON d.id = dio.id_dish
-    WHERE o.reference = 'CMD-001' AND d.name = 'Hot Dog'
+    WHERE o.reference = 'CMD-001' AND d.name = 'Hot dog'
 )
   AND status = 'FINISHED';
 
@@ -111,7 +111,7 @@ WHERE id_dish_order IN (
     FROM dish_order dio
              JOIN "order" o ON o.id = dio.id_order
              JOIN dish d ON d.id = dio.id_dish
-    WHERE o.reference = 'CMD-003' AND d.name = 'Hot Dog'
+    WHERE o.reference = 'CMD-003' AND d.name = 'Hot dog'
 )
   AND status = 'IN_PROGRESS';
 
@@ -122,7 +122,7 @@ WHERE id_dish_order IN (
     FROM dish_order dio
              JOIN "order" o ON o.id = dio.id_order
              JOIN dish d ON d.id = dio.id_dish
-    WHERE o.reference = 'CMD-003' AND d.name = 'Hot Dog'
+    WHERE o.reference = 'CMD-003' AND d.name = 'Hot dog'
 )
   AND status = 'FINISHED';
 

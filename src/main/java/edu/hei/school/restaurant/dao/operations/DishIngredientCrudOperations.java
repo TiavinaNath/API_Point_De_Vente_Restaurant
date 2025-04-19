@@ -65,16 +65,15 @@ public class DishIngredientCrudOperations implements CrudOperations<DishIngredie
                     statement.setLong(3, entity.getIngredient().getId());
                     statement.setDouble(4, entity.getRequiredQuantity());
                     statement.setString(5, entity.getUnit().name());
-                    statement.addBatch();
+
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        if (resultSet.next()) {
+                            savedDishIngredients.add(dishIngredientMapper.apply(resultSet));
+                        }
+                    }
 
                 } catch (SQLException e) {
                     throw new ServerException(e);
-                }
-            }
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    savedDishIngredients.add(dishIngredientMapper.apply(resultSet));
                 }
             }
 
