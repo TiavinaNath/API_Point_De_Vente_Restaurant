@@ -88,9 +88,9 @@ public class OrderCrudOperations {
                                 .peek(d -> d.setOrder(savedOrder))
                                 .toList());
 
-                        System.out.println(orderToSave.getOrderStatusHistoryList());
+//                        System.out.println(orderToSave.getOrderStatusHistoryList());
                         List<OrderStatusHistory> savedStatusHistories = orderStatusHistoryCrudOperations.saveAll(orderToSave.getOrderStatusHistoryList(), savedOrder.getId());
-                        System.out.println(savedStatusHistories);
+//                        System.out.println(savedStatusHistories);
                         savedOrder.setDishOrderList(savedDishOrders);
                         savedOrder.setOrderStatusHistoryList(savedStatusHistories);
                         savedOrders.add(savedOrder);

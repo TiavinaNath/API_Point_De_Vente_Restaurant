@@ -1,7 +1,3 @@
-insert into dish(id,name, price) values (1, 'Hot dog', '15000')
-on conflict do nothing;
-
-
 insert into dish(id,name, price) values
                                      (1, 'Hot dog', '15000'),
                                      (2, 'Omelette', '5000'),
@@ -32,6 +28,11 @@ values (7, 3, 2, 0.2, 'L'),
        (8, 3, 1, 200, 'G')
     on conflict do nothing ;
 
+SELECT setval(pg_get_serial_sequence('ingredient', 'id'), (SELECT max(id) FROM ingredient));
+SELECT setval(pg_get_serial_sequence('dish_ingredient', 'id'), (SELECT max(id) FROM dish_ingredient));
+SELECT setval(pg_get_serial_sequence('dish', 'id'), (SELECT max(id) FROM dish));
+SELECT setval(pg_get_serial_sequence('price', 'id'), (SELECT max(id) FROM price));
+SELECT setval(pg_get_serial_sequence('stock_movement', 'id'), (SELECT max(id) FROM stock_movement));
 
 -- CMD-001 - Hot Dog
 UPDATE dish_order_status_history
@@ -124,7 +125,4 @@ WHERE id_dish_order IN (
     WHERE o.reference = 'CMD-003' AND d.name = 'Hot Dog'
 )
   AND status = 'FINISHED';
-
-
-
 

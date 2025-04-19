@@ -160,7 +160,7 @@ public class Order {
         }
     }
 
-    public List<DishOrder> updateDishOrders(List<DishOrder> dishOrders) {
+   public List<DishOrder> updateDishOrders(List<DishOrder> dishOrders) {
         dishOrders.forEach(dishOrder -> dishOrder.setOrder(this));
         if (getDishOrderList() == null || getDishOrderList().isEmpty()) {
             List<DishOrder> dishOrderWithStatus = dishOrders.stream()
@@ -187,6 +187,19 @@ public class Order {
         }
         return getDishOrderList();
     }
+
+    /*public List<DishOrder> updateDishOrders(List<DishOrder> dishOrders) {
+        List<DishOrder> dishOrdersWithStatus = dishOrders.stream()
+                .peek(dishOrder -> {
+                    dishOrder.setOrder(this);
+                    dishOrder.setDishOrderStatusHistoryList(List.of(new DishOrderStatusHistory(StatusDishOrder.CREATED)));
+                })
+                .toList();
+
+        setDishOrderList(dishOrdersWithStatus);
+
+        return dishOrdersWithStatus;
+    }*/
 
     public void updateOrderStatusIfAllDishesCompleted() {
         boolean allFinished = dishOrderList.stream()
